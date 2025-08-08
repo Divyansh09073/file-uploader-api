@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .file-upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #fileInput {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .upload-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .upload-button:hover {
+            background-color: #0056b3;
+        }
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            display: none;
+            word-wrap: break-word;
+        }
+        #downloadLink {
+            color: #007bff;
+            text-decoration: none;
+        }
+        #downloadLink:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>फ़ाइल अपलोड करें</h1>
+        <form id="uploadForm" class="file-upload-form">
+            <input type="file" id="fileInput" name="file" required>
+            <button type="submit" class="upload-button">अपलोड करें</button>
+        </form>
+
+        <div id="resultBox" class="result-box">
+            <p>आपकी फ़ाइल अपलोड हो गई है!</p>
+            <p>डाउनलोड लिंक: <a href="#" id="downloadLink" target="_blank"></a></p>
+        </div>
+        <div class="footer">
+            <p id="watermark"></p>
+        </div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const resultBox = document.getElementById('resultBox');
+        const downloadLink = document.getElementById('downloadLink');
+        const watermark = document.getElementById('watermark');
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('कृपया एक फ़ाइल चुनें।');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    downloadLink.href = data.url;
+                    downloadLink.textContent = data.url;
+                    resultBox.style.display = 'block';
+                } else {
+                    alert('फ़ाइल अपलोड करने में कोई त्रुटि हुई।');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('कनेक्शन में कोई समस्या हुई।');
+            }
+        });
+        
+        watermark.innerHTML = `© 2025 URL Shortener | Developed with <span style="color:red;">❤️</span> by Divyansh - Deewana.`;
+    </script>
+</body>
+</html>
